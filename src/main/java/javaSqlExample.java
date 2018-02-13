@@ -15,5 +15,8 @@ public class javaSqlExample {
         Dataset<Row> df = spark.read().json("/Users/gokul-pt1831/Downloads/spark-2.2.1-bin-hadoop2.7/examples/src/main/resources/people.json");
         df.show();
         df.printSchema();
+        df.select("name").show();
+        df.select(col("name"), col("age").plus(1)).show();
+        df.filter(col("age").gt(21)).show();
     }
 }
