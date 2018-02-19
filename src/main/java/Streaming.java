@@ -5,7 +5,6 @@ import org.apache.spark.sql.streaming.StreamingQuery;
 import org.apache.spark.sql.streaming.StreamingQueryException;
 
 import java.util.Arrays;
-import java.util.Iterator;
 
 
 public class Streaming {
@@ -14,7 +13,7 @@ public class Streaming {
 
         SparkSession spark = SparkSession
                 .builder()
-                .appName("JavaStructuredNetworkWordCount")
+                .appName("JavaStructured")
                 .master("local")
                 .getOrCreate();
 
@@ -22,7 +21,7 @@ public class Streaming {
                 .readStream()
                 .format("socket")
                 .option("host", "localhost")
-                .option("port", 8080)
+                .option("port", 9999)
                 .load();
 
 // Split the lines into words
@@ -30,13 +29,23 @@ public class Streaming {
                 .as(Encoders.STRING())
                 .flatMap((FlatMapFunction<String, String>) x -> Arrays.asList(x.split(" ")).iterator(), Encoders.STRING());
 
+
+
+
+        words.printSchema();
+
 // Generate running word count
         Dataset<Row> wordCounts = words.groupBy("value").count();
 
+
         StreamingQuery query = wordCounts.writeStream()
+
                 .outputMode("complete")
                 .format("console")
                 .start();
+
+
+
 
         query.awaitTermination();
     }
